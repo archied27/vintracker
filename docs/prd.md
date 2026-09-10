@@ -30,6 +30,7 @@ Resellers who buy items (thrifted, wholesale, or bought-to-flip) and list them o
   - Purchase date (defaults to today)
   - Source platform (Vinted, Depop, charity shop, etc. — optional tag)
   - Category/brand/size (optional, manually entered or parsed)
+  - Season (`summer` | `winter` | `autumn` | `spring`)
 - Item is created with status **Not Listed**.
 
 ### 5.2 List stage
@@ -90,6 +91,7 @@ Two import paths, both should converge on the same underlying "create item" flow
 - `title`
 - `photo_url(s)`
 - `category`, `brand`, `size` (optional)
+- `season` (`summer` | `winter` | `autumn` | `spring`)
 - `source_platform` (e.g. Vinted, charity shop, wholesale)
 - `buy_price`
 - `buy_date`
