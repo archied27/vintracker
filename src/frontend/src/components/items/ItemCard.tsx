@@ -37,6 +37,7 @@ export default function ItemCard({ item }: { item: Item }) {
                 <p className="truncate text-xs text-muted-foreground">
                     {[item.brand, item.size].filter(Boolean).join(", ") || item.category || "Uncategorized"}
                 </p>
+                <p className="text-xs capitalize text-muted-foreground">{item.season}</p>
             </div>
 
             <div className="flex items-center justify-between gap-5">

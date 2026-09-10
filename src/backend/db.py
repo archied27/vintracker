@@ -24,6 +24,8 @@ def init_db() -> None:
 				title TEXT NOT NULL,
 				photo_url TEXT,
 				category TEXT,
+				season TEXT NOT NULL DEFAULT 'summer'
+					CHECK (season IN ('summer', 'winter', 'autumn', 'spring')),
 				brand TEXT,
 				size TEXT,
 				source_platform TEXT,
@@ -50,6 +52,17 @@ def init_db() -> None:
 			);
 			"""
 		)
+		columns = {
+				row[1] for row in connection.execute("PRAGMA table_info(items)")
+		}
+		if "season" not in columns:
+			connection.execute(
+				"""
+				ALTER TABLE items
+				ADD COLUMN season TEXT NOT NULL DEFAULT 'summer'
+				CHECK (season IN ('summer', 'winter', 'autumn', 'spring'))
+				"""
+			)
 
 
 def get_db() -> Generator[sqlite3.Connection, None, None]:

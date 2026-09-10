@@ -3,7 +3,7 @@ Routes for all items endpoints
 """
 
 from datetime import date
-from typing import Any
+from typing import Any, Literal
 import sqlite3
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -13,11 +13,14 @@ from db import get_db
 
 router = APIRouter(prefix="/api/items", tags=["items"])
 
+Season = Literal["summer", "winter", "autumn", "spring"]
+
 
 class ItemCreate(BaseModel):
     title: str = Field(min_length=1)
     photo_url: str | None = None
     category: str | None = None
+    season: Season
     brand: str | None = None
     size: str | None = None
     source_platform: str | None = None
@@ -32,6 +35,7 @@ class ItemUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1)
     photo_url: str | None = None
     category: str | None = None
+    season: Season | None = None
     brand: str | None = None
     size: str | None = None
     source_platform: str | None = None
@@ -81,14 +85,15 @@ def create_item(
 ):
     cursor = connection.execute(
         """
-        INSERT INTO items (title, photo_url, category, brand, size,
+        INSERT INTO items (title, photo_url, category, season, brand, size,
                           source_platform, buy_price, buy_date, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             item.title,
             item.photo_url,
             item.category,
+            item.season,
             item.brand,
             item.size,
             item.source_platform,
