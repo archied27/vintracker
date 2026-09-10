@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from db import get_db
 
-router = APIRouter(prefix="/items", tags=["items"])
+router = APIRouter(prefix="/api/items", tags=["items"])
 
 
 class ItemCreate(BaseModel):
