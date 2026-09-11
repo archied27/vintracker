@@ -3,13 +3,16 @@ Routes for all items endpoints
 """
 
 from datetime import date
+from pathlib import Path
 from typing import Any, Literal
 import sqlite3
+import shutil
+import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 from pydantic import BaseModel, ConfigDict, Field
 
-from db import get_db
+from db import PROJECT_ROOT, get_db
 
 router = APIRouter(prefix="/api/items", tags=["items"])
 
@@ -79,10 +82,33 @@ def get_item(item_id: int, connection: sqlite3.Connection = Depends(get_db)):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_item(
-    item: ItemCreate,
+async def create_item(
+    request: Request,
+    title: str = Form(...),
+    category: str | None = Form(default=None),
+    season: Season = Form(...),
+    brand: str | None = Form(default=None),
+    size: str | None = Form(default=None),
+    source_platform: str | None = Form(default=None),
+    buy_price: float = Form(...),
+    buy_date: date = Form(...),
+    notes: str | None = Form(default=None),
+    photo: UploadFile | None = File(default=None),
     connection: sqlite3.Connection = Depends(get_db),
 ):
+    photo_url = None
+    if photo is not None and photo.filename:
+        uploads_dir = PROJECT_ROOT / "data" / "uploads"
+        uploads_dir.mkdir(parents=True, exist_ok=True)
+        safe_name = f"{uuid.uuid4()}_{photo.filename.replace(' ', '_')}"
+        destination = uploads_dir / safe_name
+        try:
+            with destination.open("wb") as buffer:
+                shutil.copyfileobj(photo.file, buffer)
+        finally:
+            await photo.close()
+        photo_url = f"{str(request.base_url).rstrip('/')}/uploads/{safe_name}"
+
     cursor = connection.execute(
         """
         INSERT INTO items (title, photo_url, category, season, brand, size,
@@ -90,16 +116,16 @@ def create_item(
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
-            item.title,
-            item.photo_url,
-            item.category,
-            item.season,
-            item.brand,
-            item.size,
-            item.source_platform,
-            item.buy_price,
-            item.buy_date.isoformat(),
-            item.notes,
+            title,
+            photo_url,
+            category,
+            season,
+            brand,
+            size,
+            source_platform,
+            buy_price,
+            buy_date.isoformat(),
+            notes,
         ),
     )
     connection.commit()

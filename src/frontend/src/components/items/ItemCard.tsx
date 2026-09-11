@@ -35,9 +35,8 @@ export default function ItemCard({ item }: { item: Item }) {
             <div className="min-w-0">
                 <h3 className="truncate text-sm font-medium">{item.title}</h3>
                 <p className="truncate text-xs text-muted-foreground">
-                    {[item.brand, item.size].filter(Boolean).join(", ") || item.category || "Uncategorized"}
+                    {[item.brand, item.size].filter(Boolean).join(", ") || item.category || ""}
                 </p>
-                <p className="text-xs capitalize text-muted-foreground">{item.season}</p>
             </div>
 
             <div className="flex items-center justify-between gap-5">

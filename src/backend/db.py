@@ -3,13 +3,14 @@ from pathlib import Path
 import sqlite3
 
 
-DATABASE_PATH = Path(__file__).resolve().parents[2] / "data" / "vintracker.db"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATABASE_PATH = PROJECT_ROOT / "data" / "vintracker.db"
 
 
 def get_connection() -> sqlite3.Connection:
 	DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-	connection = sqlite3.connect(DATABASE_PATH)
+	connection = sqlite3.connect(DATABASE_PATH, check_same_thread=False)
 	connection.row_factory = sqlite3.Row
 	connection.execute("PRAGMA foreign_keys = ON")
 	return connection

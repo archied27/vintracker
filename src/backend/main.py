@@ -5,7 +5,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from routers import items, dashboard
-from db import init_db
+from db import PROJECT_ROOT, init_db
+
+UPLOADS_DIR = PROJECT_ROOT / "data" / "uploads"
+UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 dotenv.load_dotenv()
 
@@ -19,6 +22,7 @@ app = FastAPI()
 # Include routers for items and dashboard
 app.include_router(items.router)
 app.include_router(dashboard.router)
+app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,
