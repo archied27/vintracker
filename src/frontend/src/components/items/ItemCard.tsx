@@ -9,10 +9,14 @@ const currencyFormatter = new Intl.NumberFormat("en-GB", {
 });
 
 export default function ItemCard({ item }: { item: Item }) {
-    const displayedPrice = item.sale_price ?? item.listing_price ?? item.buy_price;
-    const priceLabel = item.sale_price !== null
+    const displayedPrice = item.status === "sold"
+        ? item.sale_price ?? item.buy_price
+        : item.status === "listed"
+            ? item.listing_price ?? item.buy_price
+            : item.buy_price;
+    const priceLabel = item.status === "sold"
         ? "Sold For"
-        : item.listing_price !== null
+        : item.status === "listed"
             ? "Listed For"
             : "Bought For";
 
@@ -41,17 +45,21 @@ export default function ItemCard({ item }: { item: Item }) {
 
             <div className="flex items-center justify-between gap-5">
                 <div>
-                    <div className="text-[11px] text-muted-foreground">
-                        {priceLabel}
-                    </div>
-                    <div className="text-sm font-semibold tabular-nums">
-                        {currencyFormatter.format(displayedPrice)}
+                    <div>
+                        <div className="text-[11px] text-muted-foreground">
+                            {priceLabel}
+                        </div>
+                        <div className="text-sm font-semibold tabular-nums">
+                            {currencyFormatter.format(displayedPrice)}
+                        </div>
                     </div>
                 </div>
 
-                <div className="text-[11px] text-muted-foreground">
-                    Bought For {currencyFormatter.format(item.buy_price)}
-                </div>
+                {item.status !== "not_listed" ? (
+                    <div className="text-[11px] text-muted-foreground">
+                        Bought For {currencyFormatter.format(item.buy_price)}
+                    </div>
+                ) : null}
             </div>
         </div>
     </Card>

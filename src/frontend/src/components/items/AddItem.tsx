@@ -122,7 +122,7 @@ export function AddItemDialog({
         <DialogHeader className="border-b p-5">
           <DialogTitle>Add a new item</DialogTitle>
           <DialogDescription>
-            Log what you just bought. You can add listing and sale details later.
+            Log what you just bought.
           </DialogDescription>
         </DialogHeader>
 
@@ -161,7 +161,7 @@ export function AddItemDialog({
                 id="title"
                 value={form.title}
                 onChange={(event) => set("title", event.target.value)}
-                placeholder="e.g. Nike Vintage Windbreaker"
+                placeholder="e.g. Hollister Shorts"
                 autoFocus
                 required
               />
@@ -291,8 +291,9 @@ export default function AddItem({ onItemAdded }: { onItemAdded?: () => void }) {
 
   return (
     <>
-      <Button className="w-full" variant="ghost" onClick={() => setOpen(true)}>
-        <PlusSquareIcon className="h-16 w-16" />
+      <Button onClick={() => setOpen(true)} variant="outline">
+        <PlusSquareIcon className="size-4" />
+        Add item
       </Button>
       <AddItemDialog open={open} onOpenChange={setOpen} onItemAdded={onItemAdded} />
     </>

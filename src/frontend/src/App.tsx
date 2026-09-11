@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Inventory } from "./components/items/Inventory";
 import type { Item } from "./lib/types";
-import AddItem from "./components/items/AddItem";
+import Hero from "./components/Hero";
 
 function App() {
   const [items, setItems] = useState<Item[]>([]);
@@ -35,7 +35,7 @@ function App() {
 
   return (
     <div className="flex flex-col gap-6 p-3">
-      <AddItem onItemAdded={loadItems} />
+      <Hero onItemAdded={loadItems} />
 
       {error ? <p className="text-destructive">{error}</p> : <Inventory items={items} />}
     </div>
