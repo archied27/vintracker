@@ -149,8 +149,8 @@ export function AddItemDialog({
               )}
 
               {previewUrl ? (
-                <div className="overflow-hidden rounded-lg border bg-muted/30">
-                  <img src={previewUrl} alt="Selected item" className="h-40 w-full object-cover" />
+                <div className="aspect-square overflow-hidden rounded-lg border bg-muted/30">
+                  <img src={previewUrl} alt="Selected item" className="h-full w-full object-cover object-center" />
                 </div>
               ) : null}
             </div>
@@ -187,6 +187,7 @@ export function AddItemDialog({
                 <Input
                   id="buyDate"
                   type="date"
+                  className="appearance-none"
                   value={form.buyDate}
                   onChange={(event) => set("buyDate", event.target.value)}
                 />

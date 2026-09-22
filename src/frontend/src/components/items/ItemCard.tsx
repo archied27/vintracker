@@ -8,7 +8,7 @@ const currencyFormatter = new Intl.NumberFormat("en-GB", {
     currency: "GBP",
 });
 
-export default function ItemCard({ item }: { item: Item }) {
+export default function ItemCard({ item, onSelect }: { item: Item; onSelect: (item: Item) => void }) {
     const displayedPrice = item.status === "sold"
         ? item.sale_price ?? item.buy_price
         : item.status === "listed"
@@ -19,9 +19,19 @@ export default function ItemCard({ item }: { item: Item }) {
         : item.status === "listed"
             ? "Listed For"
             : "Bought For";
+    const statusLabel = item.status === "sold"
+        ? "Sold"
+        : item.status === "listed"
+            ? "Listed"
+            : "Not Listed";
+    const statusClassName = item.status === "sold"
+        ? "bg-emerald-500 text-white"
+        : item.status === "listed"
+            ? "bg-sky-500 text-white"
+            : "bg-amber-400 text-amber-950";
 
   return (
-    <Card className="group cursor-pointer gap-0 overflow-hidden p-0 transition-colors hover:border-primary/40 focus-visible:border-primary/40 focus-visible:ring-[3px] focus-visible:ring-ring/40 focus-visible:outline-none">
+    <Card role="button" tabIndex={0} onClick={() => onSelect(item)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onSelect(item); }} className="group cursor-pointer gap-0 overflow-hidden p-0 transition-colors hover:border-primary/40 focus-visible:border-primary/40 focus-visible:ring-[3px] focus-visible:ring-ring/40 focus-visible:outline-none">
         {/* Image Section */}
         <div className="relative aspect-square overflow-hidden bg-muted">
             {item.photo_url ? (
@@ -29,9 +39,12 @@ export default function ItemCard({ item }: { item: Item }) {
                     src={item.photo_url}
                     alt={item.title}
                     sizes="(max-width: 768px) 50vw, 240px"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
                 />
             ) : null}
+            <span className={`absolute left-2 top-2 rounded-full px-2 py-1 text-[10px] font-semibold uppercase tracking-wide shadow-sm ${statusClassName}`}>
+                {statusLabel}
+            </span>
         </div>
 
         {/* Info Section */}

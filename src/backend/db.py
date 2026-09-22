@@ -35,6 +35,7 @@ def init_db() -> None:
 				status TEXT NOT NULL DEFAULT 'not_listed'
 					CHECK (status IN ('not_listed', 'listed', 'sold')),
 				listing_price REAL CHECK (listing_price >= 0),
+				listing_url TEXT,
 				listed_date TEXT,
 				sale_price REAL CHECK (sale_price >= 0),
 				sold_date TEXT,
@@ -64,6 +65,11 @@ def init_db() -> None:
 				CHECK (season IN ('summer', 'winter', 'autumn', 'spring'))
 				"""
 			)
+		for column, definition in {
+			"listing_url": "TEXT",
+		}.items():
+			if column not in columns:
+				connection.execute(f"ALTER TABLE items ADD COLUMN {column} {definition}")
 
 
 def get_db() -> Generator[sqlite3.Connection, None, None]:

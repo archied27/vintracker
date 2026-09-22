@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Inventory } from "./components/items/Inventory";
+import { Dashboard } from "./components/dashboard/Dashboard";
 import type { Item } from "./lib/types";
 import Hero from "./components/Hero";
 
@@ -37,7 +38,10 @@ function App() {
     <div className="flex flex-col gap-6 p-3">
       <Hero onItemAdded={loadItems} />
 
-      {error ? <p className="text-destructive">{error}</p> : <Inventory items={items} />}
+      {error ? <p className="text-destructive">{error}</p> : <>
+        <Dashboard items={items} />
+        <Inventory items={items} onItemChanged={loadItems} />
+      </>}
     </div>
   );
 }

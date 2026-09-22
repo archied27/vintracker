@@ -49,6 +49,7 @@ class ItemUpdate(BaseModel):
 
 class ItemListRequest(BaseModel):
     listing_price: float = Field(ge=0)
+    listing_url: str | None = None
     listed_date: date | None = None
 
 
@@ -58,7 +59,10 @@ class ItemSellRequest(BaseModel):
 
 
 def serialize_item(row: sqlite3.Row) -> dict[str, Any]:
-    return dict(row)
+    item = dict(row)
+    item.pop("fees", None)
+    item.pop("shipping_cost", None)
+    return item
 
 
 def get_item_or_404(connection: sqlite3.Connection, item_id: int) -> sqlite3.Row:
@@ -73,12 +77,23 @@ def get_item_or_404(connection: sqlite3.Connection, item_id: int) -> sqlite3.Row
 @router.get("/")
 def get_items(connection: sqlite3.Connection = Depends(get_db)):
     rows = connection.execute("SELECT * FROM items ORDER BY id DESC").fetchall()
-    return [serialize_item(row) for row in rows]
+    items = [serialize_item(row) for row in rows]
+    for item in items:
+        item["price_history"] = [
+            serialize_item(history)
+            for history in connection.execute(
+                "SELECT price, changed_at FROM price_history WHERE item_id = ? ORDER BY changed_at",
+                (item["id"],),
+            ).fetchall()
+        ]
+    return items
 
 
 @router.get("/{item_id}")
 def get_item(item_id: int, connection: sqlite3.Connection = Depends(get_db)):
-    return serialize_item(get_item_or_404(connection, item_id))
+    item = serialize_item(get_item_or_404(connection, item_id))
+    item["price_history"] = []
+    return item
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
@@ -174,10 +189,14 @@ def mark_item_listed(
     connection.execute(
         """
         UPDATE items
-        SET status = 'listed', listing_price = ?, listed_date = ?
+        SET status = 'listed', listing_price = ?, listing_url = ?, listed_date = ?
         WHERE id = ?
         """,
-        (request.listing_price, listed_date.isoformat(), item_id),
+        (request.listing_price, request.listing_url, listed_date.isoformat(), item_id),
+    )
+    connection.execute(
+        "INSERT INTO price_history (item_id, price, changed_at) VALUES (?, ?, datetime('now'))",
+        (item_id, request.listing_price),
     )
     connection.commit()
     return serialize_item(get_item_or_404(connection, item_id))

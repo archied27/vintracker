@@ -14,6 +14,7 @@ export interface Item {
 	buy_date: string;
 	status: ItemStatus;
 	listing_price: number | null;
+	listing_url: string | null;
 	listed_date: string | null;
 	sale_price: number | null;
 	sold_date: string | null;
@@ -21,4 +22,10 @@ export interface Item {
 	margin_pct: number | null;
 	roi_pct: number | null;
 	notes: string | null;
+	price_history?: PriceHistoryEntry[];
+}
+
+export interface PriceHistoryEntry {
+	price: number;
+	changed_at: string;
 }
